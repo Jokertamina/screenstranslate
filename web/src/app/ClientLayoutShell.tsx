@@ -44,16 +44,16 @@ export function ClientLayoutShell({ children }: { children: ReactNode }) {
               </div>
             </button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 md:gap-5">
               <Image
                 src="/logo-screenstranslate.svg"
                 alt="ScreensTranslate Pro logo"
-                width={32}
-                height={32}
-                className="h-8 w-8 rounded-lg"
+                width={120}
+                height={120}
+                className="h-10 w-10 rounded-xl md:h-32 md:w-32 md:rounded-3xl"
                 priority
               />
-              <span className="text-sm font-semibold tracking-tight">
+              <span className="text-sm md:text-base font-semibold tracking-tight">
                 <Brand withPro />
               </span>
             </div>
