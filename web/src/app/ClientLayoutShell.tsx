@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { useState } from "react";
 import { Brand } from "./Brand";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -44,7 +45,14 @@ export function ClientLayoutShell({ children }: { children: ReactNode }) {
             </button>
 
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-cyan-400/90" />
+              <Image
+                src="/logo-screenstranslate.svg"
+                alt="ScreensTranslate Pro logo"
+                width={32}
+                height={32}
+                className="h-8 w-8 rounded-lg"
+                priority
+              />
               <span className="text-sm font-semibold tracking-tight">
                 <Brand withPro />
               </span>
