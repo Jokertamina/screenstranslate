@@ -1,0 +1,32 @@
+﻿[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "screenstranslate-pro"
+version = "0.1.0"
+description = "Desktop screen capture and translation tool (ScreensTranslate Pro)."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "ScreensTranslate Pro" },
+]
+dependencies = [
+  "pyside6>=6.7.0",
+  "mss>=9.0.1",
+  "pynput>=1.7.6",
+  "pillow>=10.0.0",
+  "pytesseract>=0.3.10",
+  "requests>=2.31.0",
+  "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+screenstranslate = "screenstranslate.main:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
