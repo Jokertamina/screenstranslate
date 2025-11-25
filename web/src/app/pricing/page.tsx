@@ -20,8 +20,8 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "Licencia Pro",
-    note: "Pago único por dispositivo (modelo orientativo)",
+    price: "2,50 €/mes",
+    note: "Suscripción mensual, cancela cuando quieras",
     description: (
       <>
         Pensado para profesionales y usuarios intensivos que dependen a diario
@@ -96,6 +96,16 @@ export default function PricingPage() {
                 <li key={f}>• {f}</li>
               ))}
             </ul>
+            {plan.name === "Pro" && (
+              <div className="pt-4">
+                <a
+                  href="https://buy.stripe.com/test_4gM14mfII9c21fJ6K02ZO00"
+                  className="inline-flex items-center justify-center rounded-full bg-cyan-400 px-6 py-2 text-sm font-medium text-slate-950 shadow-lg shadow-cyan-400/40 transition hover:bg-cyan-300"
+                >
+                  Suscribirse a ScreensTranslate Pro por 2,50 €/mes
+                </a>
+              </div>
+            )}
           </article>
         ))}
       </section>
@@ -106,14 +116,9 @@ export default function PricingPage() {
         </h2>
         <p>
           Descarga <Brand withPro />, utiliza el plan Basic sin coste para
-          validar que encaja en tu día a día y da el salto a Pro cuando
-          necesites más capacidad y soporte.
+          validar que encaja en tu día a día y pasa a la suscripción Pro
+          cuando necesites más capacidad y soporte.
         </p>
-        <div className="pt-1">
-          <button className="inline-flex items-center justify-center rounded-full bg-cyan-400 px-6 py-2 text-sm font-medium text-slate-950 shadow-lg shadow-cyan-400/40 transition hover:bg-cyan-300">
-            Descargar ScreensTranslate Pro para Windows
-          </button>
-        </div>
       </section>
     </div>
   );

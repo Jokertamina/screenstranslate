@@ -20,8 +20,8 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "Pro license",
-    note: "One-time payment per device (example model)",
+    price: "€2.50 / month",
+    note: "Monthly subscription, cancel anytime",
     description: (
       <>
         Designed for professionals and heavy users who depend on content in
@@ -96,6 +96,16 @@ export default function PricingPageEn() {
                 <li key={f}>• {f}</li>
               ))}
             </ul>
+            {plan.name === "Pro" && (
+              <div className="pt-4">
+                <a
+                  href="https://buy.stripe.com/test_4gM14mfII9c21fJ6K02ZO00"
+                  className="inline-flex items-center justify-center rounded-full bg-cyan-400 px-6 py-2 text-sm font-medium text-slate-950 shadow-lg shadow-cyan-400/40 transition hover:bg-cyan-300"
+                >
+                  Subscribe to ScreensTranslate Pro for €2.50 / month
+                </a>
+              </div>
+            )}
           </article>
         ))}
       </section>
@@ -106,14 +116,9 @@ export default function PricingPageEn() {
         </h2>
         <p>
           Download <Brand withPro />, use the Basic plan at no cost to confirm
-          it fits your daily routine and upgrade to Pro when you need more
-          capacity and support.
+          it fits your daily routine and move to the Pro subscription when you
+          need more capacity and support.
         </p>
-        <div className="pt-1">
-          <button className="inline-flex items-center justify-center rounded-full bg-cyan-400 px-6 py-2 text-sm font-medium text-slate-950 shadow-lg shadow-cyan-400/40 transition hover:bg-cyan-300">
-            Download ScreensTranslate Pro for Windows
-          </button>
-        </div>
       </section>
     </div>
   );
