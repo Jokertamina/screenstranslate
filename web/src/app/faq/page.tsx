@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Brand } from "../Brand";
 
 const faqs = [
@@ -8,22 +9,25 @@ const faqs = [
       <>
         No. El plan Basic está pensado para usarse sin registro obligatorio.
         Para el plan Pro solo necesitarás una clave de licencia para activar
-        <Brand withPro />.
+        <Brand withPro />. Puedes empezar con Basic sin compromiso y pasar a
+        Pro cuando veas que lo usas a diario o necesitas más capacidad.
       </>
     ),
   },
   {
     question: "¿Qué diferencia hay entre Basic y Pro?",
     answer:
-      "Basic tiene un número limitado de traducciones al día y está pensado para uso ocasional. Pro está pensado para uso diario, con más margen de uso y funciones avanzadas.",
+      "Basic tiene un número limitado de traducciones al día y está pensado para uso ocasional o para probar la herramienta. Pro está pensado para uso diario, con más margen de uso dentro de una política de uso justo, mejor prioridad de traducción, historial ampliado y soporte preferente por email.",
   },
   {
     question: "¿ScreensTranslate Pro envía mis capturas a algún servidor?",
     answer: (
       <>
-        La captura se procesa en tu equipo para extraer el texto. Solo el texto
-        reconocido puede enviarse al proveedor de traducción configurado (por
-        ejemplo, DeepL) cuando utilizas <Brand withPro />.
+        La captura se procesa en tu equipo para extraer el texto; no guardamos
+        tus imágenes en nuestros servidores. Solo el texto reconocido puede
+        enviarse al proveedor de traducción que hayas configurado (por
+        ejemplo, DeepL) cuando utilizas <Brand withPro />, y tú eliges qué
+        contenido traducir.
       </>
     ),
   },
@@ -39,8 +43,16 @@ const faqs = [
   },
   {
     question: "¿Qué pasa si reinstalo Windows o cambio de ordenador?",
-    answer:
-      "Tu licencia Pro está asociada a un dispositivo. Si cambias de equipo, podrás gestionar activaciones desde el futuro panel web o solicitando soporte.",
+    answer: (
+      <>
+        Tu licencia Pro puede estar activa en varios dispositivos a la vez (por
+        defecto hasta 3). Si reinstalas Windows o cambias de equipo, instala
+        ScreensTranslate Pro en el nuevo ordenador, introduce tu clave y
+        ocupará una de esas activaciones. Si en algún momento alcanzas el
+        límite de dispositivos y necesitas liberar activaciones antiguas,
+        puedes escribirnos a soporte y te ayudaremos a reajustarlas.
+      </>
+    ),
   },
 ];
 
@@ -54,7 +66,7 @@ const faqJsonLd = {
       acceptedAnswer: {
         "@type": "Answer",
         text:
-          "No. El plan Basic está pensado para usarse sin registro obligatorio. Para el plan Pro solo necesitarás una clave de licencia para activar ScreensTranslate Pro.",
+          "No. El plan Basic está pensado para usarse sin registro obligatorio. Para el plan Pro solo necesitarás una clave de licencia para activar ScreensTranslate Pro. Puedes empezar con Basic sin compromiso y pasar a Pro cuando veas que lo usas a diario o necesitas más capacidad.",
       },
     },
     {
@@ -63,7 +75,7 @@ const faqJsonLd = {
       acceptedAnswer: {
         "@type": "Answer",
         text:
-          "Basic tiene un número limitado de traducciones al día y está pensado para uso ocasional. Pro está pensado para uso diario, con más margen de uso y funciones avanzadas.",
+          "Basic tiene un número limitado de traducciones al día y está pensado para uso ocasional o para probar la herramienta. Pro está pensado para uso diario, con más margen de uso dentro de una política de uso justo, mejor prioridad de traducción, historial ampliado y soporte preferente por email.",
       },
     },
     {
@@ -72,7 +84,7 @@ const faqJsonLd = {
       acceptedAnswer: {
         "@type": "Answer",
         text:
-          "La captura se procesa en tu equipo para extraer el texto. Solo el texto reconocido puede enviarse al proveedor de traducción configurado (por ejemplo, DeepL).",
+          "La captura se procesa en tu equipo para extraer el texto; no guardamos tus imágenes en nuestros servidores. Solo el texto reconocido puede enviarse al proveedor de traducción que hayas configurado (por ejemplo, DeepL) y tú eliges qué contenido traducir.",
       },
     },
     {
@@ -99,7 +111,7 @@ const faqJsonLd = {
       acceptedAnswer: {
         "@type": "Answer",
         text:
-          "Tu licencia Pro está asociada a un dispositivo. Si cambias de equipo, podrás gestionar activaciones desde el futuro panel web o solicitando soporte.",
+          "Tu licencia Pro puede estar activa en varios dispositivos a la vez (por defecto hasta 3). Si reinstalas Windows o cambias de equipo, instala ScreensTranslate Pro en el nuevo ordenador, introduce tu clave y ocupará una de esas activaciones. Si en algún momento alcanzas el límite de dispositivos y necesitas liberar activaciones antiguas, puedes escribirnos a soporte y te ayudaremos a reajustarlas.",
       },
     },
   ],
@@ -164,6 +176,26 @@ export default function FAQPage() {
           <button className="inline-flex items-center justify-center rounded-full bg-cyan-400 px-6 py-2 text-sm font-medium text-slate-950 shadow-lg shadow-cyan-400/40 transition hover:bg-cyan-300">
             Descargar ScreensTranslate Pro para Windows
           </button>
+        </div>
+        <div className="space-y-2 text-xs text-slate-400">
+          <p className="font-medium text-slate-300">
+            Más recursos relacionados:
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            <li>
+              <Link href="/pricing">Ver planes de ScreensTranslate Pro</Link>
+            </li>
+            <li>
+              <Link href="/guias/como-traducir-texto-en-pantalla-windows-11">
+                Cómo traducir texto en pantalla en Windows 11
+              </Link>
+            </li>
+            <li>
+              <Link href="/guias/como-traducir-captura-de-pantalla-a-texto">
+                Cómo traducir una captura de pantalla a texto
+              </Link>
+            </li>
+          </ul>
         </div>
       </section>
 

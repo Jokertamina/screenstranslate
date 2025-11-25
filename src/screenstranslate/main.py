@@ -26,7 +26,7 @@ from .history import add_entry
 from .history_ui import HistoryWindow
 from .hotkey import HotkeyListener
 from .hotkey_input import HotkeyLineEdit
-from .licensing import check_and_register_use, activate_license, is_pro
+from .licensing import check_and_register_use, activate_license, is_pro, maybe_refresh_license
 from .ocr import TextBlock, extract_text_blocks
 from .overlay import OverlayBlock, TranslationOverlay
 from .selector import SelectionOverlay
@@ -37,26 +37,27 @@ APP_NAME = "ScreensTranslate Pro"
 
 
 class ConfigWindow(QMainWindow):
-    """Ventana principal de configuraciÃ³n de ScreensTranslate Pro.
+    """Ventana principal de configuración de ScreensTranslate Pro.
 
     De momento solo permite ajustar idioma origen/destino y hotkey.
-    MÃ¡s adelante se integrarÃ¡ con el flujo de captura/OCR/traducciÃ³n.
+    Más adelante se integrará con el flujo de captura/OCR/traducción.
     """
 
     hotkeyTriggered = Signal()
 
     SUPPORTED_LANGS = [
-        ("auto", "DetecciÃ³n automÃ¡tica"),
-        ("es", "EspaÃ±ol"),
-        ("en", "InglÃ©s"),
-        ("ja", "JaponÃ©s"),
+        ("auto", "Detección automática"),
+        ("es", "Español"),
+        ("en", "Inglés"),
+        ("ja", "Japonés"),
         ("ko", "Coreano"),
         ("zh", "Chino"),
     ]
 
     def __init__(self, config: dict):
         super().__init__()
-        self.config = config
+        self.config = maybe_refresh_license(config)
+        save_config(self.config)
         self.setWindowTitle(APP_NAME)
         self._translation_client = TranslationClient()
         self._current_overlay: TranslationOverlay | None = None
@@ -81,7 +82,7 @@ class ConfigWindow(QMainWindow):
 
         title = QLabel(APP_NAME, card)
         title.setObjectName("titleLabel")
-        subtitle = QLabel("Captura y traduce texto de cualquier aplicaciÃ³n al instante", card)
+        subtitle = QLabel("Captura y traduce texto de cualquier aplicación al instante", card)
         subtitle.setObjectName("subtitleLabel")
         subtitle.setWordWrap(True)
 
@@ -110,6 +111,7 @@ class ConfigWindow(QMainWindow):
         self.activate_license_btn = QPushButton("Activar Pro", card)
         self.activate_license_btn.setObjectName("secondaryButton")
         self.activate_license_btn.clicked.connect(self._on_activate_license_clicked)
+        self.activate_license_btn.setEnabled(True)  # Always enable the button
 
         self.save_btn = QPushButton("Guardar", card)
         self.save_btn.clicked.connect(self._on_save_clicked)
@@ -120,7 +122,7 @@ class ConfigWindow(QMainWindow):
         self.history_btn = QPushButton("Historial", card)
         self.history_btn.clicked.connect(self._on_history_clicked)
 
-        self.manage_sub_btn = QPushButton("Gestionar suscripciÃ³n", card)
+        self.manage_sub_btn = QPushButton("Gestionar suscripción", card)
         self.manage_sub_btn.setObjectName("secondaryButton")
         self.manage_sub_btn.clicked.connect(self._on_manage_subscription_clicked)
 
@@ -156,7 +158,6 @@ class ConfigWindow(QMainWindow):
         # Reflejar estado Pro actual en la UI.
         if is_pro(self.config):
             self.activate_license_btn.setText("Pro activo")
-            self.activate_license_btn.setEnabled(False)
 
     @staticmethod
     def _set_current_lang(combo: QComboBox, code: str) -> None:
@@ -171,14 +172,14 @@ class ConfigWindow(QMainWindow):
         self.config["hotkey"] = self.hotkey_edit.text().strip() or "ctrl+shift+t"
         self.config["license_key"] = self.license_edit.text().strip()
         save_config(self.config)
-        self.statusBar().showMessage("ConfiguraciÃ³n guardada", 3000)
+        self.statusBar().showMessage("Configuración guardada", 3000)
 
         # Actualizar listener de hotkey si estÃ¡ activo.
         if self._hotkey_listener is not None:
             try:
                 self._hotkey_listener.update_hotkey(self.config["hotkey"])
             except ValueError as exc:
-                logging.getLogger(__name__).warning("Hotkey invÃ¡lido: %s", exc)
+                logging.getLogger(__name__).warning("Hotkey inválido: %s", exc)
 
     @Slot()
     def _on_test_capture_clicked(self) -> None:
@@ -189,7 +190,7 @@ class ConfigWindow(QMainWindow):
         save_config(self.config)
 
         if not check_result.allowed:
-            msg = check_result.message or "Has alcanzado el lÃ­mite de uso en la versiÃ³n Basic."
+            msg = check_result.message or "Has alcanzado el límite de uso en la versión Basic."
             self.statusBar().showMessage(msg, 5000)
             return
 
@@ -252,7 +253,6 @@ class ConfigWindow(QMainWindow):
         # Actualizar estado de Pro en la UI (por ahora solo afecta a los lÃ­mites).
         if is_pro(self.config):
             self.activate_license_btn.setText("Pro activo")
-            self.activate_license_btn.setEnabled(False)
 
     def _apply_styles(self) -> None:
         """Aplica estilos visuales a la ventana de configuraciÃ³n."""

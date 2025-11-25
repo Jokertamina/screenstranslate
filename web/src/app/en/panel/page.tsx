@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Brand } from "../../Brand";
+import { LicensePanelClientEn } from "../../panel/LicensePanelClientEn";
 
 export const metadata: Metadata = {
   title: "ScreensTranslate Pro license panel",
   description:
-    "Initial license panel for ScreensTranslate Pro. Soon you will be able to look up your licenses and their status by entering your key.",
+    "License panel for ScreensTranslate Pro. Check your license status and open the Stripe portal to manage your subscription.",
   alternates: {
     canonical: "/en/panel",
     languages: {
@@ -12,6 +13,10 @@ export const metadata: Metadata = {
       "es-ES": "/panel",
       "fr-FR": "/fr/panel",
     },
+  },
+  robots: {
+    index: false,
+    follow: false,
   },
 };
 
@@ -26,44 +31,13 @@ export default function PanelPageEn() {
           <Brand withPro /> licenses
         </h1>
         <p className="max-w-2xl text-[15px] leading-relaxed text-slate-200">
-          This section is under development. Very soon you&apos;ll be able to enter
-          your license key to check its status and see details such as plan,
-          creation date and number of activated devices.
+          From this panel you can check the status of your ScreensTranslate Pro
+          license and open the Stripe portal to manage your subscription. You
+          just need the key you received on the confirmation page.
         </p>
       </header>
 
-      <section className="space-y-4 text-[13px] leading-relaxed text-slate-300">
-        <h2 className="text-sm font-semibold text-slate-100">
-          Panel preview
-        </h2>
-        <p>
-          There will be a simple form here where you can paste your license key
-          and, later on, sign in with your email to see all your associated
-          licenses.
-        </p>
-        <form className="mt-2 space-y-3">
-          <label className="block text-xs font-medium text-slate-300">
-            License key
-            <input
-              type="text"
-              placeholder="XXXX-XXXX-XXXX-XXXX"
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
-              disabled
-            />
-          </label>
-          <p className="text-[11px] text-slate-400">
-            Soon you&apos;ll be able to use this form to query your licenses
-            directly from the website.
-          </p>
-          <button
-            type="button"
-            disabled
-            className="inline-flex cursor-not-allowed items-center justify-center rounded-full border border-slate-600 px-5 py-2 text-xs font-medium text-slate-400"
-          >
-            License lookup in development
-          </button>
-        </form>
-      </section>
+      <LicensePanelClientEn />
     </div>
   );
 }

@@ -160,6 +160,19 @@ export default function GuiaTextoPantalla() {
             asegurarte de que el atajo y el overlay se comportan como esperas.
           </li>
         </ul>
+        <p className="text-xs text-slate-400">
+          Si te interesa la parte técnica del reconocimiento de texto en
+          Windows, Microsoft explica cómo funciona su API de OCR en{" "}
+          <a
+            href="https://learn.microsoft.com/en-us/windows/ai/apis/text-recognition"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cyan-300 hover:text-cyan-200"
+          >
+            la documentación oficial de Windows para OCR
+          </a>
+          .
+        </p>
       </section>
 
       <section className="space-y-3 border-t border-slate-800 pt-6 text-sm leading-relaxed text-slate-300">
@@ -172,6 +185,23 @@ export default function GuiaTextoPantalla() {
           manuales. Instálalo, configura tu atajo y pruébalo con los documentos y
           aplicaciones que usas a diario.
         </p>
+        <div className="space-y-2 text-xs text-slate-400">
+          <p className="font-medium text-slate-300">
+            También te puede interesar:
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            <li>
+              <Link href="/guias/como-traducir-captura-de-pantalla-a-texto">
+                Cómo traducir una captura de pantalla a texto en Windows
+              </Link>
+            </li>
+            <li>
+              <Link href="/pricing">
+                Ver planes de ScreensTranslate Pro (Basic gratis y Pro para uso intensivo)
+              </Link>
+            </li>
+          </ul>
+        </div>
         <div className="pt-1">
           <Link
             href="/"

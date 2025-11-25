@@ -8,7 +8,7 @@ import { OverlayPreview } from "../OverlayPreview";
 export const metadata: Metadata = {
   title: "ScreensTranslate Pro – Traducteur de texte à l'écran pour Windows",
   description:
-    "ScreensTranslate Pro capture une zone de votre écran, effectue un OCR et traduit le texte en temps réel dans un bandeau propre et configurable.",
+    "ScreensTranslate Pro capture une zone de votre écran sous Windows 10 et 11, effectue un OCR et traduit le texte en temps réel dans un bandeau propre et configurable.",
   alternates: {
     canonical: "/fr",
     languages: {
@@ -109,6 +109,18 @@ export default function HomeFr() {
             </p>
           </div>
         </div>
+      </section>
+
+      <section className="space-y-3 border-t border-slate-800 pt-6 text-xs leading-relaxed text-slate-400">
+        <p className="font-medium text-slate-200">
+          Vous voulez comparer les plans Basic et Pro ?
+        </p>
+        <p>
+          <Link href="/fr/pricing" className="text-cyan-300 hover:text-cyan-200">
+            Voir les tarifs de ScreensTranslate Pro
+          </Link>
+          .
+        </p>
       </section>
 
       <SeoSoftwareJsonLd />

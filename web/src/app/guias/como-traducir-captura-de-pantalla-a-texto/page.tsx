@@ -167,6 +167,23 @@ export default function GuiaCapturaTexto() {
           pantalla a servicios externos: todo el proceso de OCR se realiza en tu
           equipo y solo se envía el texto reconocido al traductor.
         </p>
+        <div className="space-y-2 text-xs text-slate-400">
+          <p className="font-medium text-slate-300">
+            También te puede interesar:
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            <li>
+              <Link href="/guias/como-traducir-texto-en-pantalla-windows-11">
+                Cómo traducir texto en pantalla en Windows 11 paso a paso
+              </Link>
+            </li>
+            <li>
+              <Link href="/pricing">
+                Ver planes de ScreensTranslate Pro (Basic gratis y Pro para uso intensivo)
+              </Link>
+            </li>
+          </ul>
+        </div>
         <div className="pt-1">
           <Link
             href="/"

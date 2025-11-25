@@ -28,6 +28,7 @@ create table if not exists public.license_activations (
   id uuid primary key default gen_random_uuid(),
   license_id uuid not null references public.licenses(id) on delete cascade,
   device_id text not null,
+  device_label text,
   app_version text,
   created_at timestamptz not null default now(),
   last_seen_at timestamptz not null default now(),

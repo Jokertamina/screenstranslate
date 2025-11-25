@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Brand } from "../Brand";
 
 const plans = [
@@ -50,6 +51,15 @@ export const metadata: Metadata = {
       "en-US": "/en/pricing",
       "fr-FR": "/fr/pricing",
     },
+  },
+  openGraph: {
+    title: "Planes de ScreensTranslate Pro",
+    description:
+      "Compara el plan Basic gratuito y la suscripción Pro de ScreensTranslate Pro para Windows.",
+    url: "https://screenstranslate.com/pricing",
+    siteName: "ScreensTranslate Pro",
+    type: "website",
+    locale: "es_ES",
   },
 };
 
@@ -119,6 +129,23 @@ export default function PricingPage() {
           validar que encaja en tu día a día y pasa a la suscripción Pro
           cuando necesites más capacidad y soporte.
         </p>
+        <div className="space-y-2 text-xs text-slate-400">
+          <p className="font-medium text-slate-300">
+            Aprende más sobre cómo usar ScreensTranslate Pro:
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            <li>
+              <Link href="/guias/como-traducir-texto-en-pantalla-windows-11">
+                Cómo traducir texto en pantalla en Windows 11
+              </Link>
+            </li>
+            <li>
+              <Link href="/guias/como-traducir-captura-de-pantalla-a-texto">
+                Cómo traducir una captura de pantalla a texto
+              </Link>
+            </li>
+          </ul>
+        </div>
       </section>
     </div>
   );

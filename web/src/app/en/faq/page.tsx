@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Brand } from "../../Brand";
 
 const faqs = [
@@ -38,8 +39,15 @@ const faqs = [
   },
   {
     question: "What happens if I reinstall Windows or change computer?",
-    answer:
-      "Your Pro license is associated with one device. If you change machine, you will be able to manage activations from the future web panel or by contacting support.",
+    answer: (
+      <>
+        Your Pro license can be active on several devices at the same time (by
+        default up to 3). If you reinstall Windows or switch to a new PC, just
+        install ScreensTranslate Pro, enter your key and it will use one of
+        those slots. If you ever reach the device limit and need to free old
+        activations, contact support and we&apos;ll help you adjust them.
+      </>
+    ),
   },
 ];
 
@@ -98,7 +106,7 @@ const faqJsonLdEn = {
       acceptedAnswer: {
         "@type": "Answer",
         text:
-          "Your Pro license is associated with one device. If you change machine, you will be able to manage activations from the future web panel or by contacting support.",
+          "Your Pro license can be active on several devices at the same time (by default up to 3). If you reinstall Windows or switch to a new PC, just install ScreensTranslate Pro, enter your key and it will use one of those slots. If you ever reach the device limit and need to free old activations, contact support and we&apos;ll help you adjust them.",
       },
     },
   ],
@@ -163,6 +171,32 @@ export default function FAQPageEn() {
           <button className="inline-flex items-center justify-center rounded-full bg-cyan-400 px-6 py-2 text-sm font-medium text-slate-950 shadow-lg shadow-cyan-400/40 transition hover:bg-cyan-300">
             Download ScreensTranslate Pro for Windows
           </button>
+        </div>
+        <div className="space-y-2 text-xs text-slate-400">
+          <p className="font-medium text-slate-300">
+            Related resources:
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            <li>
+              <Link href="/en/pricing">See ScreensTranslate Pro plans</Link>
+            </li>
+            <li>
+              <a
+                href="/guias/como-traducir-texto-en-pantalla-windows-11"
+                className="text-cyan-300 hover:text-cyan-200"
+              >
+                How to translate on-screen text in Windows 11 (guide in Spanish)
+              </a>
+            </li>
+            <li>
+              <a
+                href="/guias/como-traducir-captura-de-pantalla-a-texto"
+                className="text-cyan-300 hover:text-cyan-200"
+              >
+                How to translate a screenshot to text (guide in Spanish)
+              </a>
+            </li>
+          </ul>
         </div>
       </section>
 

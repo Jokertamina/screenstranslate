@@ -11,11 +11,9 @@ type LicenseInfo = {
   max_devices: number | null;
   payment_provider?: string | null;
   payment_reference?: string | null;
-  stripe_status?: string | null;
-  stripe_current_period_end?: string | null;
 };
 
-export function LicensePanelClient() {
+export function LicensePanelClientEn() {
   const [licenseKey, setLicenseKey] = useState("");
   const [license, setLicense] = useState<LicenseInfo | null>(null);
   const [loading, setLoading] = useState(false);
@@ -25,7 +23,7 @@ export function LicensePanelClient() {
   const [deleteMessage, setDeleteMessage] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
-  // Oculta automáticamente los mensajes de error después de 15 segundos
+  // Auto-hide errors after 15 seconds
   useEffect(() => {
     if (!error) return;
     const id = setTimeout(() => {
@@ -39,7 +37,7 @@ export function LicensePanelClient() {
 
     const key = licenseKey.trim();
     if (!key) {
-      setError("Introduce tu clave de licencia.");
+      setError("Please enter your license key.");
       setLicense(null);
       return;
     }
@@ -58,14 +56,14 @@ export function LicensePanelClient() {
 
       if (res.status === 404) {
         setLicense(null);
-        setError("No hemos encontrado ninguna licencia con esa clave.");
+        setError("We couldn’t find any license with that key.");
         return;
       }
 
       if (!res.ok) {
         setLicense(null);
         setError(
-          "Ha ocurrido un error al buscar tu licencia. Inténtalo de nuevo más tarde.",
+          "An error occurred while searching for your license. Please try again later.",
         );
         return;
       }
@@ -75,7 +73,7 @@ export function LicensePanelClient() {
     } catch {
       setLicense(null);
       setError(
-        "No se ha podido contactar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
+        "We couldn’t contact the server. Check your connection and try again.",
       );
     } finally {
       setLoading(false);
@@ -85,7 +83,7 @@ export function LicensePanelClient() {
   async function handleManageSubscription() {
     const key = licenseKey.trim();
     if (!key) {
-      setError("Introduce primero tu clave de licencia.");
+      setError("Enter your license key first.");
       return;
     }
 
@@ -102,15 +100,13 @@ export function LicensePanelClient() {
       });
 
       if (res.status === 404) {
-        setError(
-          "No hemos encontrado una suscripción activa asociada a esta licencia.",
-        );
+        setError("We couldn’t find an active subscription for this license.");
         return;
       }
 
       if (!res.ok) {
         setError(
-          "No se ha podido abrir el portal de suscripción. Inténtalo de nuevo más tarde.",
+          "We couldn’t open the subscription portal. Please try again later.",
         );
         return;
       }
@@ -119,10 +115,10 @@ export function LicensePanelClient() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        setError("La respuesta del portal de suscripción no es válida.");
+        setError("The response from the subscription portal is not valid.");
       }
     } catch {
-      setError("No se ha podido abrir el portal de suscripción.");
+      setError("We couldn’t open the subscription portal.");
     } finally {
       setPortalLoading(false);
     }
@@ -131,9 +127,7 @@ export function LicensePanelClient() {
   async function handleDeleteConfirmed() {
     const key = licenseKey.trim();
     if (!key) {
-      setError(
-        "Introduce primero tu clave de licencia para poder eliminar tus datos.",
-      );
+      setError("Enter your license key first so we can remove your data.");
       setConfirmingDelete(false);
       return;
     }
@@ -155,14 +149,14 @@ export function LicensePanelClient() {
 
       if (res.status === 400 && data.error === "SUBSCRIPTION_ACTIVE") {
         setError(
-          "Tu suscripción sigue activa. Primero cancélala desde 'Gestionar suscripción y facturas' y, después, vuelve aquí para eliminar tus datos.",
+          "Your subscription is still active. First cancel it from ‘Manage subscription and invoices’, then come back here to remove your data.",
         );
         return;
       }
 
       if (!res.ok) {
         setError(
-          "No se han podido eliminar tus datos en este momento. Inténtalo de nuevo más tarde.",
+          "We couldn’t remove your data at this moment. Please try again later.",
         );
         return;
       }
@@ -170,11 +164,11 @@ export function LicensePanelClient() {
       setLicense(null);
       setLicenseKey("");
       setDeleteMessage(
-        "Hemos eliminado tu licencia y los dispositivos asociados de ScreensTranslate. Puedes conservar tus justificantes de pago en Stripe.",
+        "We’ve removed your license and associated devices from ScreensTranslate. You can still keep your payment receipts in Stripe.",
       );
     } catch {
       setError(
-        "No se ha podido contactar con el servidor para eliminar tus datos.",
+        "We couldn’t contact the server to remove your data. Please try again.",
       );
     } finally {
       setDeleteLoading(false);
@@ -184,7 +178,7 @@ export function LicensePanelClient() {
 
   function formatDate(iso: string) {
     try {
-      return new Intl.DateTimeFormat("es-ES", {
+      return new Intl.DateTimeFormat("en-US", {
         dateStyle: "medium",
         timeStyle: "short",
       }).format(new Date(iso));
@@ -196,9 +190,9 @@ export function LicensePanelClient() {
   function getStatusLabel(status: string) {
     switch (status) {
       case "active":
-        return "activa";
+        return "active";
       case "revoked":
-        return "desactivada";
+        return "disabled";
       default:
         return status;
     }
@@ -220,15 +214,15 @@ export function LicensePanelClient() {
 
   return (
     <section className="space-y-4 text-[13px] leading-relaxed text-slate-300">
-      <h2 className="text-sm font-semibold text-slate-100">Consulta tu licencia</h2>
+      <h2 className="text-sm font-semibold text-slate-100">Check your license</h2>
       <p>
-        Pega la clave de licencia que has recibido en la página de gracias para
-        ver los detalles de tu licencia y gestionar tu suscripción.
+        Paste the license key you received on the thank you page to see the
+        details of your license and manage your subscription.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-2 space-y-3">
         <label className="block text-xs font-medium text-slate-300">
-          Clave de licencia
+          License key
           <input
             type="text"
             value={licenseKey}
@@ -239,8 +233,8 @@ export function LicensePanelClient() {
         </label>
         <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
           <span>
-            Solo tú conoces esta clave. Pégala desde el portapapeles para evitar
-            errores.
+            Only you know this key. Paste it from the clipboard to avoid
+            typos.
           </span>
         </div>
         <button
@@ -248,7 +242,7 @@ export function LicensePanelClient() {
           disabled={loading}
           className="inline-flex items-center justify-center rounded-full border border-cyan-400/70 px-5 py-2 text-xs font-medium text-cyan-100 hover:bg-cyan-500/10 disabled:cursor-not-allowed disabled:border-slate-600 disabled:text-slate-400"
         >
-          {loading ? "Buscando licencia..." : "Ver detalles de la licencia"}
+          {loading ? "Searching license..." : "View license details"}
         </button>
       </form>
 
@@ -268,14 +262,14 @@ export function LicensePanelClient() {
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
-                Detalles de la licencia
+                License details
               </p>
               <p className="mt-1 font-mono text-sm text-cyan-100">
                 {license.license_key}
               </p>
             </div>
             <span className={getStatusClasses(license.status)}>
-              Estado: {getStatusLabel(license.status)}
+              Status: {getStatusLabel(license.status)}
             </span>
           </div>
 
@@ -285,21 +279,13 @@ export function LicensePanelClient() {
               <dd className="text-slate-100 capitalize">{license.plan}</dd>
             </div>
             <div>
-              <dt className="text-slate-400">Creada</dt>
+              <dt className="text-slate-400">Created</dt>
               <dd className="text-slate-100">{formatDate(license.created_at)}</dd>
             </div>
-            {license.stripe_current_period_end && (
-              <div>
-                <dt className="text-slate-400">Renueva o expira el</dt>
-                <dd className="text-slate-100">
-                  {formatDate(license.stripe_current_period_end)}
-                </dd>
-              </div>
-            )}
             <div>
-              <dt className="text-slate-400">Dispositivos máximos</dt>
+              <dt className="text-slate-400">Max devices</dt>
               <dd className="text-slate-100">
-                {license.max_devices ?? "Sin límite específico"}
+                {license.max_devices ?? "No specific limit"}
               </dd>
             </div>
           </dl>
@@ -312,22 +298,22 @@ export function LicensePanelClient() {
               className="mt-3 inline-flex items-center justify-center rounded-full bg-cyan-400 px-5 py-2 text-sm font-medium text-slate-950 shadow-lg shadow-cyan-400/40 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:shadow-none"
             >
               {portalLoading
-                ? "Abriendo portal de suscripción..."
-                : "Gestionar suscripción y facturas"}
+                ? "Opening subscription portal..."
+                : "Manage subscription and invoices"}
             </button>
 
             <p className="mt-3 text-slate-300">
-              Desde aquí accederás al portal seguro de Stripe para cambiar tu
-              método de pago, revisar tus facturas o cancelar tu suscripción
-              cuando quieras. ScreensTranslate no almacena los datos de tu
-              tarjeta.
+              From here you&apos;ll go to the secure Stripe portal to change your
+              payment method, review your invoices or cancel your subscription.
+              ScreensTranslate does not store your card details.
             </p>
           </div>
 
           <div className="mt-4 space-y-2 border-t border-slate-800 pt-3 text-[12px]">
             <p className="text-slate-400">
-              Si ya has cancelado tu suscripción y solo quieres que eliminemos
-              tus datos de ScreensTranslate, puedes hacerlo desde aquí.
+              If you&apos;ve already cancelled your subscription and just want us to
+              remove your data from ScreensTranslate, you can do it here. Your
+              payment history in Stripe will not be modified.
             </p>
             <button
               type="button"
@@ -335,7 +321,7 @@ export function LicensePanelClient() {
                 const key = licenseKey.trim();
                 if (!key) {
                   setError(
-                    "Introduce primero tu clave de licencia para poder eliminar tus datos.",
+                    "Enter your license key first so we can remove your data.",
                   );
                   return;
                 }
@@ -347,8 +333,8 @@ export function LicensePanelClient() {
               className="inline-flex items-center justify-center rounded-full border border-rose-500/70 px-5 py-2 text-xs font-medium text-rose-200 hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:border-slate-600 disabled:text-slate-400"
             >
               {deleteLoading
-                ? "Eliminando datos..."
-                : "Eliminar mis datos de ScreensTranslate"}
+                ? "Removing data..."
+                : "Delete my data from ScreensTranslate"}
             </button>
           </div>
         </div>
@@ -357,16 +343,16 @@ export function LicensePanelClient() {
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/70">
           <div className="w-full max-w-md rounded-2xl border border-rose-500/60 bg-slate-900 px-5 py-6 text-[13px] shadow-2xl">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-rose-300">
-              Confirmar eliminación de datos
+              Confirm data deletion
             </p>
             <p className="mt-3 text-slate-100">
-              Esta acción eliminará tu licencia y todas las activaciones
-              asociadas en ScreensTranslate.
+              This action will delete your license and all associated
+              activations from ScreensTranslate.
             </p>
             <p className="mt-2 text-[12px] text-slate-400">
-              Asegúrate de que ya has cancelado tu suscripción desde
-              "Gestionar suscripción y facturas". Tus justificantes de pago y
-              facturas seguirán disponibles en tu cuenta de Stripe.
+              Make sure you&apos;ve already cancelled your subscription from
+              "Manage subscription and invoices". Your payment receipts and
+              invoices will remain available in your Stripe account.
             </p>
             <div className="mt-5 flex justify-end gap-3 text-[12px]">
               <button
@@ -374,7 +360,7 @@ export function LicensePanelClient() {
                 onClick={() => setConfirmingDelete(false)}
                 className="inline-flex items-center justify-center rounded-full border border-slate-600 px-4 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-800"
               >
-                Cancelar
+                Cancel
               </button>
               <button
                 type="button"
@@ -382,7 +368,7 @@ export function LicensePanelClient() {
                 disabled={deleteLoading}
                 className="inline-flex items-center justify-center rounded-full bg-rose-500 px-4 py-1.5 text-xs font-medium text-slate-950 shadow-lg shadow-rose-500/40 transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:shadow-none"
               >
-                {deleteLoading ? "Eliminando datos..." : "Sí, eliminar mis datos"}
+                {deleteLoading ? "Removing data..." : "Yes, delete my data"}
               </button>
             </div>
           </div>

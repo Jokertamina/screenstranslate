@@ -8,7 +8,13 @@ import { OverlayPreview } from "./OverlayPreview";
 export const metadata: Metadata = {
   title: "ScreensTranslate Pro – Traductor de texto en pantalla para Windows",
   description:
-    "ScreensTranslate Pro es un traductor de pantalla para Windows que usa OCR para reconocer texto en tu monitor y traducirlo al instante con un overlay cómodo.",
+    "ScreensTranslate Pro es un traductor de texto en pantalla para Windows 10 y 11 que usa OCR para reconocer texto en tu monitor (juegos, vídeos, PDFs, webs) y traducirlo al instante en un overlay tipo subtítulos.",
+  keywords: [
+    "traducir texto en pantalla",
+    "traductor de pantalla para Windows",
+    "traducir texto de capturas de pantalla",
+    "traductor OCR Windows",
+  ],
   alternates: {
     canonical: "/",
     languages: {
@@ -16,6 +22,16 @@ export const metadata: Metadata = {
       "en-US": "/en",
       "fr-FR": "/fr",
     },
+  },
+  openGraph: {
+    title:
+      "ScreensTranslate Pro – Traductor de texto en pantalla para Windows",
+    description:
+      "Traduce texto en pantalla y capturas a texto en Windows en segundos con ScreensTranslate Pro.",
+    url: "https://screenstranslate.com/",
+    siteName: "ScreensTranslate Pro",
+    type: "website",
+    locale: "es_ES",
   },
 };
 
@@ -131,6 +147,18 @@ export default function Home() {
               externos.
             </p>
           </Link>
+        </div>
+        <div className="mt-4 text-xs text-slate-400">
+          <span>
+            ¿Quieres comparar el plan Basic y Pro?{" "}
+            <Link
+              href="/pricing"
+              className="text-cyan-300 hover:text-cyan-200"
+            >
+              Ver planes de ScreensTranslate Pro
+            </Link>
+            .
+          </span>
         </div>
       </section>
 

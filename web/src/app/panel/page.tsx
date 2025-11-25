@@ -14,6 +14,10 @@ export const metadata: Metadata = {
       "fr-FR": "/fr/panel",
     },
   },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function PanelPage() {

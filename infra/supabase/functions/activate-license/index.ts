@@ -12,6 +12,7 @@ interface ActivatePayload {
   license_key?: string;
   device_id?: string;
   app_version?: string;
+  device_label?: string;
 }
 
 serve(async (req: Request): Promise<Response> => {
@@ -38,6 +39,7 @@ serve(async (req: Request): Promise<Response> => {
   const licenseKey = (body.license_key || "").trim();
   const deviceId = (body.device_id || "").trim();
   const appVersion = (body.app_version || "unknown").trim();
+  const deviceLabel = (body.device_label || "").trim();
 
   if (!licenseKey || !deviceId) {
     return json(
@@ -93,6 +95,7 @@ serve(async (req: Request): Promise<Response> => {
       license_id: license.id,
       device_id: deviceId,
       app_version: appVersion,
+      device_label: deviceLabel || null,
       last_seen_at: new Date().toISOString(),
     }, {
       onConflict: "license_id,device_id",

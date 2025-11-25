@@ -19,6 +19,20 @@ class TranslationConfig:
     base_url: Optional[str]
 
 
+# Endpoint de traducción por defecto para la app de escritorio.
+# Por defecto apunta al dominio público de la web; en desarrollo
+# puedes sobrescribirlo con SCREENSTRANSLATE_TRANSLATION_API_URL
+# para usar, por ejemplo, http://localhost:3000/api/translate.
+DEFAULT_TRANSLATION_API_URL = os.getenv(
+    "SCREENSTRANSLATE_TRANSLATION_API_URL",
+    "https://screenstranslate.com/api/translate",
+)
+DEFAULT_TRANSLATION_API_KEY = os.getenv(
+    "SCREENSTRANSLATE_TRANSLATION_API_KEY",
+    "screenstranslate-public",
+)
+
+
 def _load_config_from_env() -> TranslationConfig:
     """Carga configuraciÃ³n de traducciÃ³n desde variables de entorno.
 
@@ -42,11 +56,20 @@ def _load_config_from_env() -> TranslationConfig:
     api_key = os.getenv("TRANSLATION_API_KEY")
     base_url = os.getenv("TRANSLATION_API_URL")
     if api_key and base_url:
-        logger.info("Proveedor de traducciÃ³n genÃ©rico configurado: %s", base_url)
+        logger.info("Proveedor de traducción genérico configurado: %s", base_url)
         return TranslationConfig(provider="generic", api_key=api_key, base_url=base_url)
 
-    logger.info("Proveedor de traducciÃ³n en modo DEMO (sin backend configurado)")
-    return TranslationConfig(provider="demo", api_key=None, base_url=None)
+    # Sin configuración explícita, usamos el backend HTTP por
+    # defecto (la API de la web) en lugar del modo DEMO.
+    logger.info(
+        "Proveedor de traducción genérico por defecto: %s (sin claves en el cliente)",
+        DEFAULT_TRANSLATION_API_URL,
+    )
+    return TranslationConfig(
+        provider="generic",
+        api_key=DEFAULT_TRANSLATION_API_KEY,
+        base_url=DEFAULT_TRANSLATION_API_URL,
+    )
 
 
 def _deepl_lang(code: str) -> str:

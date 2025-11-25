@@ -14,6 +14,7 @@ from datetime import date
 from typing import Any, Dict, Optional
 import os
 import uuid
+import platform
 
 import requests
 
@@ -41,18 +42,84 @@ class ActivationResult:
     success: bool
     updated_config: Dict[str, Any]
     message: str
+    http_status: Optional[int] = None
 
 
 def is_pro(config: Dict[str, Any]) -> bool:
     """Devuelve True si la app estÃ¡ en modo Pro.
 
-    A dÃ­a de hoy, la **fuente de verdad** es que exista una license_key
-    no vacÃ­a en la configuraciÃ³n. El flag is_pro se mantiene solo por
-    compatibilidad y legibilidad, y se intenta mantener sincronizado.
+    A dÃ­a de hoy, la **fuente de verdad** es una combinaciÃ³n de la clave de
+    licencia y la informaciÃ³n que devuelve el backend (plan y estado). El
+    flag is_pro se mantiene solo por compatibilidad y legibilidad, y se
+    intenta mantener sincronizado.
     """
 
     license_key = str(config.get("license_key") or "").strip()
-    return bool(license_key)
+    if not license_key:
+        return False
+
+    status = str(config.get("license_status") or "").strip().lower()
+    if status and status != "active":
+        return False
+
+    plan = str(config.get("plan") or "").strip().lower()
+    if plan:
+        return plan == "pro"
+
+    # Compatibilidad hacia atrÃ¡s: si hay clave pero no tenemos mÃ¡s
+    # informaciÃ³n, asumimos Pro.
+    return True
+
+
+def maybe_refresh_license(config: Dict[str, Any]) -> Dict[str, Any]:
+    """Revalida la licencia contra el backend, como mÃ¡ximo una vez al dÃ­a.
+
+    Si no hay backend configurado o no hay licencia, devuelve la
+    configuraciÃ³n sin cambios. Si el backend indica que la licencia ya no
+    es vÃ¡lida (revocada, caducada, etc.), limpia el estado Pro local para
+    evitar que una licencia cancelada siga activa indefinidamente.
+    """
+
+    if DEVELOPMENT_MODE:
+        return config
+
+    api_url = os.getenv(LICENSE_API_URL_ENV) or ""
+    if not api_url:
+        return config
+
+    license_key = str(config.get("license_key") or "").strip()
+    if not license_key:
+        return config
+
+    today = date.today().isoformat()
+    last_check = config.get("last_license_check_date")
+    if last_check == today:
+        return config
+
+    # Trabajamos sobre una copia para no corromper el estado original si
+    # hay problemas de red.
+    current_cfg = dict(config)
+    result = activate_license(current_cfg, license_key)
+    new_cfg = dict(current_cfg)
+    new_cfg.update(result.updated_config)
+    new_cfg["last_license_check_date"] = today
+
+    # Si el backend responde explÃ­citamente con un cÃ³digo que indica que la
+    # licencia ya no es vÃ¡lida, limpiamos el estado local.
+    if (
+        not result.success
+        and result.http_status is not None
+        and result.http_status in (401, 403, 404)
+    ):
+        new_cfg.pop("license_key", None)
+        new_cfg["is_pro"] = False
+        new_cfg.pop("plan", None)
+        new_cfg.pop("remote_daily_limit", None)
+        new_cfg.pop("remote_max_devices", None)
+        new_cfg.pop("license_expires_at", None)
+        new_cfg["license_status"] = "revoked"
+
+    return new_cfg
 
 
 def check_and_register_use(config: Dict[str, Any]) -> UsageCheckResult:
@@ -65,6 +132,10 @@ def check_and_register_use(config: Dict[str, Any]) -> UsageCheckResult:
     if DEVELOPMENT_MODE:
         # En desarrollo no aplicamos lÃ­mites para facilitar las pruebas.
         return UsageCheckResult(True, config)
+
+    # Antes de aplicar lÃ­mites, intentamos sincronizar el estado de la
+    # licencia con el backend (como mÃ¡ximo una vez al dÃ­a).
+    config = maybe_refresh_license(config)
 
     if is_pro(config):
         return UsageCheckResult(True, config)
@@ -144,6 +215,20 @@ def _ensure_device_id(config: Dict[str, Any]) -> str:
     return device_id
 
 
+def _get_device_label() -> str:
+    """Construye un nombre legible de dispositivo.
+
+    Usa el nombre del equipo que ya tiene el sistema operativo y aÃ±ade el
+    sistema (Windows, etc.). El resultado se recorta a 80 caracteres para
+    evitar textos excesivamente largos en la base de datos.
+    """
+
+    name = os.environ.get("COMPUTERNAME") or platform.node() or "PC"
+    system = platform.system() or "Windows"
+    label = f"{name} ({system})"
+    return label[:80]
+
+
 def activate_license(config: Dict[str, Any], key: str) -> ActivationResult:
     """Activa una licencia usando el backend remoto si estÃ¡ configurado.
 
@@ -163,11 +248,13 @@ def activate_license(config: Dict[str, Any], key: str) -> ActivationResult:
     # Trabajamos sobre una copia del config; el llamante decidirÃ¡ si lo guarda.
     new_cfg = dict(config)
     device_id = _ensure_device_id(new_cfg)
+    device_label = _get_device_label()
 
     payload = {
         "license_key": key,
         "device_id": device_id,
         "app_version": os.getenv("SCREENSTRANSLATE_APP_VERSION", "dev"),
+        "device_label": device_label,
     }
 
     headers = {"Content-Type": "application/json"}
@@ -184,17 +271,23 @@ def activate_license(config: Dict[str, Any], key: str) -> ActivationResult:
             f"No se pudo contactar con el servidor de licencias: {exc}",
         )
 
-    if resp.status_code != 200:
-        msg = resp.text or "Error remoto al activar la licencia."
-        return ActivationResult(False, config, msg)
-
     try:
         data = resp.json()
     except Exception:  # noqa: BLE001
+        # Si no podemos interpretar la respuesta como JSON, devolvemos un
+        # mensaje genÃ©rico evitando mostrar contenido bruto poco legible.
+        if resp.status_code >= 400:
+            return ActivationResult(
+                False,
+                config,
+                "Error remoto al activar la licencia. IntÃ©ntalo de nuevo mÃ¡s tarde.",
+                http_status=resp.status_code,
+            )
         return ActivationResult(False, config, "Respuesta de licencia no vÃ¡lida.")
 
-    if not data.get("success"):
-        return ActivationResult(False, config, str(data.get("message") or "Licencia no vÃ¡lida."))
+    if not resp.ok or not data.get("success"):
+        msg = str(data.get("message") or "Licencia no vÃ¡lida o no activa.")
+        return ActivationResult(False, config, msg, http_status=resp.status_code)
 
     plan = str(data.get("plan") or "pro").lower()
 
@@ -204,7 +297,13 @@ def activate_license(config: Dict[str, Any], key: str) -> ActivationResult:
 
     if "daily_limit" in data:
         new_cfg["remote_daily_limit"] = data.get("daily_limit")
+    if "max_devices" in data:
+        new_cfg["remote_max_devices"] = data.get("max_devices")
+    if "expires_at" in data:
+        new_cfg["license_expires_at"] = data.get("expires_at")
+    if "status" in data:
+        new_cfg["license_status"] = data.get("status")
 
     msg = str(data.get("message") or "Licencia Pro activada en este equipo.")
-    return ActivationResult(True, new_cfg, msg)
+    return ActivationResult(True, new_cfg, msg, http_status=resp.status_code)
 

@@ -16,6 +16,10 @@ export const metadata: Metadata = {
       "fr-FR": "/fr/thanks",
     },
   },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 type ThanksPageProps = {

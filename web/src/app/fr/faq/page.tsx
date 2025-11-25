@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Brand } from "../../Brand";
 
 const faqs = [
@@ -39,8 +40,17 @@ const faqs = [
   },
   {
     question: "Que se passe-t-il si je réinstalle Windows ou change d'ordinateur ?",
-    answer:
-      "Votre licence Pro est associée à un appareil. Si vous changez de machine, vous pourrez gérer les activations depuis le futur panneau web ou en contactant le support.",
+    answer: (
+      <>
+        Votre licence Pro peut être active sur plusieurs appareils en même
+        temps (par défaut jusqu&apos;à 3). Si vous réinstallez Windows ou changez
+        d&apos;ordinateur, installez ScreensTranslate Pro sur la nouvelle machine,
+        saisissez votre clé et elle utilisera l&apos;un de ces emplacements. Si
+        vous atteignez un jour la limite d&apos;appareils et devez libérer des
+        activations anciennes, contactez le support et nous vous aiderons à les
+        ajuster.
+      </>
+    ),
   },
 ];
 
@@ -99,7 +109,7 @@ const faqJsonLdFr = {
       acceptedAnswer: {
         "@type": "Answer",
         text:
-          "Votre licence Pro est associée à un appareil. Si vous changez de machine, vous pourrez gérer les activations depuis le futur panneau web ou en contactant le support.",
+          "Votre licence Pro peut être active sur plusieurs appareils en même temps (par défaut jusqu&apos;à 3). Si vous réinstallez Windows ou changez d&apos;ordinateur, installez ScreensTranslate Pro sur la nouvelle machine, saisissez votre clé et elle utilisera l&apos;un de ces emplacements. Si vous atteignez un jour la limite d&apos;appareils et devez libérer des activations anciennes, contactez le support et nous vous aiderons à les ajuster.",
       },
     },
   ],
@@ -166,6 +176,36 @@ export default function FAQFr() {
           <button className="inline-flex items-center justify-center rounded-full bg-cyan-400 px-6 py-2 text-sm font-medium text-slate-950 shadow-lg shadow-cyan-400/40 transition hover:bg-cyan-300">
             Télécharger ScreensTranslate Pro pour Windows
           </button>
+        </div>
+        <div className="space-y-2 text-xs text-slate-400">
+          <p className="font-medium text-slate-300">
+            Ressources liées :
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            <li>
+              <Link href="/fr/pricing">
+                Voir les tarifs de ScreensTranslate Pro
+              </Link>
+            </li>
+            <li>
+              <a
+                href="/guias/como-traducir-texto-en-pantalla-windows-11"
+                className="text-cyan-300 hover:text-cyan-200"
+              >
+                Comment traduire le texte à l'écran sous Windows 11 (guide en
+                espagnol)
+              </a>
+            </li>
+            <li>
+              <a
+                href="/guias/como-traducir-captura-de-pantalla-a-texto"
+                className="text-cyan-300 hover:text-cyan-200"
+              >
+                Comment traduire une capture d'écran en texte (guide en
+                espagnol)
+              </a>
+            </li>
+          </ul>
         </div>
       </section>
 
