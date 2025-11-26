@@ -2,6 +2,7 @@
 import os
 import sys
 import signal
+import locale
 
 # Permitir ejecutar este archivo directamente (por ejemplo,
 # `python src/screenstranslate/main.py`) añadiendo el directorio
@@ -53,6 +54,130 @@ from screenstranslate.translation import TranslationClient, TranslationError
 
 APP_NAME = "ScreensTranslate Pro"
 
+UI_TEXTS = {
+    "es": {
+        "subtitle": "Traduce al instante cualquier texto que ves en pantalla",
+        "label_source_lang": "Idioma origen",
+        "label_target_lang": "Idioma destino",
+        "label_hotkey": "Hotkey global",
+        "label_license": "Licencia Pro",
+        "btn_save": "Guardar",
+        "btn_test_capture": "Probar traducción rápida",
+        "btn_history": "Historial",
+        "btn_manage_subscription": "Gestionar suscripción",
+        "btn_activate_pro": "Activar ScreensTranslate Pro",
+        "btn_activate_pro_active": "Pro activo",
+        "placeholder_license": "Introduce tu clave de licencia Pro",
+        "status_saved": "Configuración guardada",
+        "status_selection_canceled": "Selección cancelada",
+        "status_limit_reached": "Has alcanzado el límite de uso en la versión Basic.",
+        "status_no_text": "No se ha detectado texto en la región seleccionada",
+        "status_ocr_not_found": "Tesseract OCR no está instalado o no se encuentra en el PATH.",
+        "status_translation_error": "Error de traducción",
+        "status_translation_shown": "Traducción mostrada. Pulsa Esc o haz clic para cerrar.",
+        "splash_loading": "Cargando ScreensTranslate Pro...",
+        "lang_labels": {
+            "auto": "Detección automática",
+            "es": "Español",
+            "en": "Inglés",
+            "ja": "Japonés",
+            "ko": "Coreano",
+            "zh": "Chino",
+        },
+        "label_ui_language": "Idioma de la aplicación",
+        "ui_lang_auto": "Automático (según Windows)",
+        "ui_lang_es": "Español",
+        "ui_lang_en": "Inglés",
+        "ui_lang_fr": "Francés",
+    },
+    "en": {
+        "subtitle": "Understand any text on your screen in seconds",
+        "label_source_lang": "Source language",
+        "label_target_lang": "Target language",
+        "label_hotkey": "Global hotkey",
+        "label_license": "Pro license",
+        "btn_save": "Save",
+        "btn_test_capture": "Try quick translation",
+        "btn_history": "History",
+        "btn_manage_subscription": "Manage subscription",
+        "btn_activate_pro": "Activate ScreensTranslate Pro",
+        "btn_activate_pro_active": "Pro active",
+        "placeholder_license": "Enter your Pro license key",
+        "status_saved": "Settings saved",
+        "status_selection_canceled": "Selection cancelled",
+        "status_limit_reached": "You've reached the usage limit for the Basic plan.",
+        "status_no_text": "No text detected in the selected region",
+        "status_ocr_not_found": "Tesseract OCR is not installed or not found in PATH.",
+        "status_translation_error": "Translation error",
+        "status_translation_shown": "Translation displayed. Press Esc or click to close.",
+        "splash_loading": "Loading ScreensTranslate Pro...",
+        "lang_labels": {
+            "auto": "Automatic detection",
+            "es": "Spanish",
+            "en": "English",
+            "ja": "Japanese",
+            "ko": "Korean",
+            "zh": "Chinese",
+        },
+        "label_ui_language": "App language",
+        "ui_lang_auto": "Automatic (use Windows language)",
+        "ui_lang_es": "Spanish",
+        "ui_lang_en": "English",
+        "ui_lang_fr": "French",
+    },
+    "fr": {
+        "subtitle": "Comprenez n’importe quel texte à l’écran en quelques secondes",
+        "label_source_lang": "Langue source",
+        "label_target_lang": "Langue cible",
+        "label_hotkey": "Raccourci global",
+        "label_license": "Licence Pro",
+        "btn_save": "Enregistrer",
+        "btn_test_capture": "Essayer la traduction rapide",
+        "btn_history": "Historique",
+        "btn_manage_subscription": "Gérer l’abonnement",
+        "btn_activate_pro": "Activer ScreensTranslate Pro",
+        "btn_activate_pro_active": "Pro actif",
+        "placeholder_license": "Saisissez votre clé de licence Pro",
+        "status_saved": "Configuration enregistrée",
+        "status_selection_canceled": "Sélection annulée",
+        "status_limit_reached": "Vous avez atteint la limite d’utilisation du plan Basic.",
+        "status_no_text": "Aucun texte détecté dans la zone sélectionnée",
+        "status_ocr_not_found": "Tesseract OCR n’est pas installé ou introuvable dans le PATH.",
+        "status_translation_error": "Erreur de traduction",
+        "status_translation_shown": "Traduction affichée. Appuyez sur Échap ou cliquez pour fermer.",
+        "splash_loading": "Chargement de ScreensTranslate Pro...",
+        "lang_labels": {
+            "auto": "Détection automatique",
+            "es": "Espagnol",
+            "en": "Anglais",
+            "ja": "Japonais",
+            "ko": "Coréen",
+            "zh": "Chinois",
+        },
+        "label_ui_language": "Langue de l’application",
+        "ui_lang_auto": "Automatique (selon Windows)",
+        "ui_lang_es": "Espagnol",
+        "ui_lang_en": "Anglais",
+        "ui_lang_fr": "Français",
+    },
+}
+
+
+def _detect_ui_language(config: dict) -> str:
+    lang = (config.get("ui_language") or "auto").lower()
+    if lang != "auto" and lang in UI_TEXTS:
+        return lang
+    try:
+        system_locale, _ = locale.getdefaultlocale()
+    except Exception:
+        system_locale = None
+    code = ""
+    if system_locale:
+        code = system_locale.split("_")[0].lower()
+    if code in UI_TEXTS:
+        return code
+    return "en"
+
 
 def _resource_path(relative_path: str) -> str:
     """Devuelve la ruta absoluta a un recurso, compatible con PyInstaller.
@@ -79,19 +204,15 @@ class ConfigWindow(QMainWindow):
 
     hotkeyTriggered = Signal()
 
-    SUPPORTED_LANGS = [
-        ("auto", "Detección automática"),
-        ("es", "Español"),
-        ("en", "Inglés"),
-        ("ja", "Japonés"),
-        ("ko", "Coreano"),
-        ("zh", "Chino"),
-    ]
+    SUPPORTED_LANGS = ["auto", "es", "en", "ja", "ko", "zh"]
 
     def __init__(self, config: dict):
         super().__init__()
         self.config = maybe_refresh_license(config)
+        self.ui_language = _detect_ui_language(self.config)
+        self.config["ui_language"] = self.ui_language
         save_config(self.config)
+        self._texts = UI_TEXTS[self.ui_language]
         self.setWindowTitle(APP_NAME)
         self._translation_client = TranslationClient()
         self._current_overlay: TranslationOverlay | None = None
@@ -116,7 +237,7 @@ class ConfigWindow(QMainWindow):
 
         title = QLabel(APP_NAME, card)
         title.setObjectName("titleLabel")
-        subtitle = QLabel("Captura y traduce texto de cualquier aplicación al instante", card)
+        subtitle = QLabel(self._texts["subtitle"], card)
         subtitle.setObjectName("subtitleLabel")
         subtitle.setWordWrap(True)
 
@@ -124,13 +245,22 @@ class ConfigWindow(QMainWindow):
         form_layout.setHorizontalSpacing(12)
         form_layout.setVerticalSpacing(8)
 
+        self.combo_ui_lang = QComboBox(card)
+        self.combo_ui_lang.addItem(self._texts["ui_lang_auto"], "auto")
+        self.combo_ui_lang.addItem(self._texts["ui_lang_es"], "es")
+        self.combo_ui_lang.addItem(self._texts["ui_lang_en"], "en")
+        self.combo_ui_lang.addItem(self._texts["ui_lang_fr"], "fr")
+
         self.combo_src = QComboBox(card)
         self.combo_tgt = QComboBox(card)
-        for code, label in self.SUPPORTED_LANGS:
+        lang_labels = self._texts["lang_labels"]
+        for code in self.SUPPORTED_LANGS:
+            label = lang_labels.get(code, code)
             self.combo_src.addItem(label, code)
             self.combo_tgt.addItem(label, code)
 
         # Seleccionar valores actuales
+        self._set_current_lang(self.combo_ui_lang, self.config.get("ui_language", "auto"))
         self._set_current_lang(self.combo_src, self.config.get("language_source", "auto"))
         self._set_current_lang(self.combo_tgt, self.config.get("language_target", "es"))
 
@@ -139,24 +269,24 @@ class ConfigWindow(QMainWindow):
 
         self.license_edit = QLineEdit(card)
         self.license_edit.setObjectName("licenseEdit")
-        self.license_edit.setPlaceholderText("Introduce tu clave de licencia Pro")
+        self.license_edit.setPlaceholderText(self._texts["placeholder_license"])
         self.license_edit.setText(self.config.get("license_key", ""))
 
-        self.activate_license_btn = QPushButton("Activar Pro", card)
+        self.activate_license_btn = QPushButton(self._texts["btn_activate_pro"], card)
         self.activate_license_btn.setObjectName("secondaryButton")
         self.activate_license_btn.clicked.connect(self._on_activate_license_clicked)
         self.activate_license_btn.setEnabled(True)  # Always enable the button
 
-        self.save_btn = QPushButton("Guardar", card)
+        self.save_btn = QPushButton(self._texts["btn_save"], card)
         self.save_btn.clicked.connect(self._on_save_clicked)
 
-        self.test_btn = QPushButton("Probar captura", card)
+        self.test_btn = QPushButton(self._texts["btn_test_capture"], card)
         self.test_btn.clicked.connect(self._on_test_capture_clicked)
 
-        self.history_btn = QPushButton("Historial", card)
+        self.history_btn = QPushButton(self._texts["btn_history"], card)
         self.history_btn.clicked.connect(self._on_history_clicked)
 
-        self.manage_sub_btn = QPushButton("Gestionar suscripción", card)
+        self.manage_sub_btn = QPushButton(self._texts["btn_manage_subscription"], card)
         self.manage_sub_btn.setObjectName("secondaryButton")
         self.manage_sub_btn.clicked.connect(self._on_manage_subscription_clicked)
 
@@ -164,10 +294,11 @@ class ConfigWindow(QMainWindow):
         self.test_btn.setObjectName("secondaryButton")
         self.history_btn.setObjectName("secondaryButton")
 
-        form_layout.addRow("Idioma origen", self.combo_src)
-        form_layout.addRow("Idioma destino", self.combo_tgt)
-        form_layout.addRow("Hotkey global", self.hotkey_edit)
-        form_layout.addRow("Licencia Pro", self.license_edit)
+        form_layout.addRow(self._texts["label_ui_language"], self.combo_ui_lang)
+        form_layout.addRow(self._texts["label_source_lang"], self.combo_src)
+        form_layout.addRow(self._texts["label_target_lang"], self.combo_tgt)
+        form_layout.addRow(self._texts["label_hotkey"], self.hotkey_edit)
+        form_layout.addRow(self._texts["label_license"], self.license_edit)
 
         buttons_layout = QHBoxLayout()
         buttons_layout.setSpacing(8)
@@ -191,7 +322,7 @@ class ConfigWindow(QMainWindow):
 
         # Reflejar estado Pro actual en la UI.
         if is_pro(self.config):
-            self.activate_license_btn.setText("Pro activo")
+            self.activate_license_btn.setText(self._texts["btn_activate_pro_active"])
 
     @staticmethod
     def _set_current_lang(combo: QComboBox, code: str) -> None:
@@ -201,12 +332,13 @@ class ConfigWindow(QMainWindow):
                 return
 
     def _on_save_clicked(self) -> None:
+        self.config["ui_language"] = self.combo_ui_lang.currentData() or "auto"
         self.config["language_source"] = self.combo_src.currentData()
         self.config["language_target"] = self.combo_tgt.currentData()
         self.config["hotkey"] = self.hotkey_edit.text().strip() or "ctrl+shift+t"
         self.config["license_key"] = self.license_edit.text().strip()
         save_config(self.config)
-        self.statusBar().showMessage("Configuración guardada", 3000)
+        self.statusBar().showMessage(self._texts["status_saved"], 3000)
 
         # Actualizar listener de hotkey si estÃ¡ activo.
         if self._hotkey_listener is not None:
@@ -224,7 +356,7 @@ class ConfigWindow(QMainWindow):
         save_config(self.config)
 
         if not check_result.allowed:
-            msg = check_result.message or "Has alcanzado el límite de uso en la versión Basic."
+            msg = check_result.message or self._texts["status_limit_reached"]
             self.statusBar().showMessage(msg, 5000)
             return
 
@@ -349,7 +481,7 @@ class ConfigWindow(QMainWindow):
 
     @Slot()
     def _on_selection_canceled(self) -> None:
-        self.statusBar().showMessage("SelecciÃ³n cancelada", 3000)
+        self.statusBar().showMessage(self._texts["status_selection_canceled"], 3000)
         if self._selection_overlay is not None:
             self._selection_overlay.close()
             self._selection_overlay = None
@@ -379,14 +511,14 @@ class ConfigWindow(QMainWindow):
                 exc,
             )
             self.statusBar().showMessage(
-                "Tesseract OCR no estÃ¡ instalado o no se encuentra en el PATH.",
+                self._texts["status_ocr_not_found"],
                 7000,
             )
             return
 
         logger.info("Bloques de texto detectados por OCR: %s", len(blocks))
         if not blocks:
-            self.statusBar().showMessage("No se ha detectado texto en la regiÃ³n seleccionada", 4000)
+            self.statusBar().showMessage(self._texts["status_no_text"], 4000)
             return
 
         # Agrupar palabras en lÃ­neas para que el overlay sea mÃ¡s legible.
@@ -398,7 +530,7 @@ class ConfigWindow(QMainWindow):
             translated = self._translation_client.translate_texts(texts, source_lang, target_lang)
         except TranslationError as exc:
             logger.error("Error en la traducciÃ³n: %s", exc)
-            self.statusBar().showMessage("Error de traducciÃ³n", 5000)
+            self.statusBar().showMessage(self._texts["status_translation_error"], 5000)
             return
 
         overlay_blocks: list[OverlayBlock] = []
@@ -426,7 +558,9 @@ class ConfigWindow(QMainWindow):
         line_count = max(1, len(line_blocks))
         approx_line_height = 22  # px aproximados por lÃ­nea en el overlay
         min_height = min(260, line_count * approx_line_height + 40)
-        screen = QGuiApplication.primaryScreen()
+        # Usar la pantalla en la que cae la regiÃ³n seleccionada (centro del rect)
+        # para que el overlay se ajuste correctamente tambiÃ©n en monitores secundarios.
+        screen = QGuiApplication.screenAt(overlay_rect.center()) or QGuiApplication.primaryScreen()
         if overlay_rect.height() < min_height:
             overlay_rect.setHeight(min_height)
             if screen is not None:
@@ -443,7 +577,7 @@ class ConfigWindow(QMainWindow):
         self._current_overlay = TranslationOverlay(overlay_rect, overlay_blocks)
         self._current_overlay.show()
         self.statusBar().showMessage(
-            "TraducciÃ³n mostrada. Pulsa Esc o haz clic para cerrar.",
+            self._texts["status_translation_shown"],
             5000,
         )
 
@@ -552,6 +686,10 @@ def main() -> None:
     os.environ.setdefault("QT_ENABLE_HIGHDPI_SCALING", "1")
 
     cfg = load_config()
+    ui_language = _detect_ui_language(cfg)
+    cfg["ui_language"] = ui_language
+    save_config(cfg)
+    ui_texts = UI_TEXTS.get(ui_language, UI_TEXTS["en"])
 
     app = QApplication(sys.argv)
 
@@ -564,7 +702,7 @@ def main() -> None:
     splash.setWindowFlag(Qt.WindowStaysOnTopHint)
     if os.path.exists(icon_path):
         splash.setPixmap(QIcon(icon_path).pixmap(256, 256))
-    splash.showMessage("Cargando ScreensTranslate Pro...", Qt.AlignCenter)
+    splash.showMessage(ui_texts["splash_loading"], Qt.AlignCenter)
     splash.show()
     app.processEvents()
 

@@ -19,6 +19,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "language_target": "es",
     "hotkey": "ctrl+shift+t",
     "is_pro": False,
+    "ui_language": "auto",
 }
 
 
