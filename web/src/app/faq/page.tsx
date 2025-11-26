@@ -54,6 +54,22 @@ const faqs = [
       </>
     ),
   },
+  {
+    question:
+      "Windows me muestra un aviso de seguridad (SmartScreen) al instalar, ¿es normal?",
+    answer: (
+      <>
+        Sí. Windows Defender SmartScreen puede mostrar un aviso porque
+        <Brand withPro /> es una aplicación nueva y el editor aún no tiene
+        reputación suficiente. En ese caso, haz clic en
+        <strong> "Más información" </strong>
+        y luego en
+        <strong> "Ejecutar de todas formas" </strong>
+        para continuar con la instalación si has descargado el instalador desde
+        nuestra web oficial.
+      </>
+    ),
+  },
 ];
 
 const faqJsonLd = {
@@ -112,6 +128,16 @@ const faqJsonLd = {
         "@type": "Answer",
         text:
           "Tu licencia Pro puede estar activa en varios dispositivos a la vez (por defecto hasta 3). Si reinstalas Windows o cambias de equipo, instala ScreensTranslate Pro en el nuevo ordenador, introduce tu clave y ocupará una de esas activaciones. Si en algún momento alcanzas el límite de dispositivos y necesitas liberar activaciones antiguas, puedes escribirnos a soporte y te ayudaremos a reajustarlas.",
+      },
+    },
+    {
+      "@type": "Question",
+      name:
+        "Windows me muestra un aviso de seguridad (SmartScreen) al instalar, ¿es normal?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Sí. Windows Defender SmartScreen puede mostrar un aviso porque ScreensTranslate Pro es una aplicación nueva y el editor aún no tiene reputación suficiente. En ese caso, haz clic en 'Más información' y luego en 'Ejecutar de todas formas' para continuar con la instalación si has descargado el instalador desde la web oficial.",
       },
     },
   ],
