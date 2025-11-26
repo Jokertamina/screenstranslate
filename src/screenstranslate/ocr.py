@@ -8,6 +8,7 @@ from PIL import Image
 import pytesseract
 from pytesseract import TesseractNotFoundError
 import os
+import sys
 import platform
 import logging
 import subprocess
@@ -72,6 +73,34 @@ def _configure_tesseract_cmd_if_needed() -> None:
             return
         else:
             logger.warning("TESSERACT_CMD apunta a una ruta inexistente: %s", env_cmd)
+
+    # 3) Buscar una copia embebida junto al proyecto / ejecutable.
+    #    - En modo PyInstaller usamos sys._MEIPASS.
+    #    - En modo desarrollo asumimos que el repo tiene una carpeta
+    #      "Tesseract-OCR" en la raíz.
+    bundle_base: Path | None = None
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass:
+        bundle_base = Path(meipass)
+    else:
+        # src/screenstranslate/ocr.py -> repo_root
+        try:
+            bundle_base = Path(__file__).resolve().parents[2]
+        except Exception:  # pragma: no cover - fallback defensivo
+            bundle_base = None
+
+    bundled_candidates: List[Path] = []
+    if bundle_base is not None:
+        for dir_name in ("Tesseract-OCR", "tesseract", "tesseract-runtime"):
+            bundled_dir = bundle_base / dir_name
+            bundled_candidates.append(bundled_dir / "tesseract.exe")
+
+    for candidate in bundled_candidates:
+        logger.info("Probando Tesseract embebido: %s", candidate)
+        if candidate.is_file():
+            pytesseract.tesseract_cmd = str(candidate)
+            logger.info("Tesseract embebido detectado en: %s", candidate)
+            return
 
     system = platform.system()
     candidates: List[Path] = []

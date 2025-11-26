@@ -27,6 +27,7 @@ __pycache__/
 .venv/
 venv/
 env/
+/Tesseract-OCR/
 
 # Build / dist
 build/
@@ -37,6 +38,12 @@ dist/
 .coverage
 .pytest_cache/
 .mypy_cache/
+
+# Instaladores generados (no versionar .exe gigantes)
+/installer/*.exe
+
+# Binarios de descarga web (instaladores, etc.)
+/web/public/downloads/*.exe
 
 # --- Env & secrets (web + backend) ---
 .env

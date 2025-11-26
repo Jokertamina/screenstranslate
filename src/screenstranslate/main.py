@@ -2,8 +2,17 @@
 import os
 import sys
 import signal
-from PySide6.QtCore import QRect, Slot, Signal, QUrl
-from PySide6.QtGui import QGuiApplication, QDesktopServices
+
+# Permitir ejecutar este archivo directamente (por ejemplo,
+# `python src/screenstranslate/main.py`) añadiendo el directorio
+# `src` al sys.path cuando no se ha instalado el paquete.
+if __name__ == "__main__" and "screenstranslate" not in sys.modules:
+    _current_dir = os.path.dirname(os.path.abspath(__file__))
+    _src_root = os.path.dirname(_current_dir)
+    if _src_root not in sys.path:
+        sys.path.insert(0, _src_root)
+from PySide6.QtCore import QRect, Slot, Signal, QUrl, Qt, QTimer
+from PySide6.QtGui import QGuiApplication, QDesktopServices, QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -15,25 +24,50 @@ from PySide6.QtWidgets import (
     QPushButton,
     QVBoxLayout,
     QWidget,
+    QSplashScreen,
 )
 
 from pytesseract import TesseractNotFoundError
 import pytesseract
 
-from .config import load_config, save_config
-from .capture import capture_region
-from .history import add_entry
-from .history_ui import HistoryWindow
-from .hotkey import HotkeyListener
-from .hotkey_input import HotkeyLineEdit
-from .licensing import check_and_register_use, activate_license, is_pro, maybe_refresh_license
-from .ocr import TextBlock, extract_text_blocks
-from .overlay import OverlayBlock, TranslationOverlay
-from .selector import SelectionOverlay
-from .translation import TranslationClient, TranslationError
+# Usamos imports absolutos basados en el paquete "screenstranslate" para
+# evitar problemas de imports relativos cuando el script se ejecuta
+# congelado (por ejemplo, con PyInstaller).
+from screenstranslate.config import load_config, save_config
+from screenstranslate.capture import capture_region
+from screenstranslate.history import add_entry
+from screenstranslate.history_ui import HistoryWindow
+from screenstranslate.hotkey import HotkeyListener
+from screenstranslate.hotkey_input import HotkeyLineEdit
+from screenstranslate.licensing import (
+    check_and_register_use,
+    activate_license,
+    is_pro,
+    maybe_refresh_license,
+)
+from screenstranslate.ocr import TextBlock, extract_text_blocks
+from screenstranslate.overlay import OverlayBlock, TranslationOverlay
+from screenstranslate.selector import SelectionOverlay
+from screenstranslate.translation import TranslationClient, TranslationError
 
 
 APP_NAME = "ScreensTranslate Pro"
+
+
+def _resource_path(relative_path: str) -> str:
+    """Devuelve la ruta absoluta a un recurso, compatible con PyInstaller.
+
+    Cuando el binario está congelado, los recursos se copian a la carpeta
+    temporal indicada por sys._MEIPASS. En desarrollo usamos la ruta
+    relativa al archivo actual.
+    """
+
+    if hasattr(sys, "_MEIPASS"):
+        base_path = getattr(sys, "_MEIPASS")
+    else:
+        # En desarrollo, tomamos como base la raíz del proyecto (padre de src).
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
 
 
 class ConfigWindow(QMainWindow):
@@ -238,7 +272,7 @@ class ConfigWindow(QMainWindow):
 
         url = os.getenv(
             "SCREENSTRANSLATE_MANAGE_SUBSCRIPTION_URL",
-            "https://screenstranslate.com/account",
+            "https://screenstranslate.com/panel",
         )
         QDesktopServices.openUrl(QUrl(url))
 
@@ -521,6 +555,19 @@ def main() -> None:
 
     app = QApplication(sys.argv)
 
+    # Establecer icono global de la aplicación (ventana, barra de tareas, etc.).
+    icon_path = _resource_path(os.path.join("assets", "screenstranslate.ico"))
+    if os.path.exists(icon_path):
+        app.setWindowIcon(QIcon(icon_path))
+
+    splash = QSplashScreen()
+    splash.setWindowFlag(Qt.WindowStaysOnTopHint)
+    if os.path.exists(icon_path):
+        splash.setPixmap(QIcon(icon_path).pixmap(256, 256))
+    splash.showMessage("Cargando ScreensTranslate Pro...", Qt.AlignCenter)
+    splash.show()
+    app.processEvents()
+
     # Permitir que Ctrl+C en el terminal cierre la app limpiamente.
     logger = logging.getLogger(__name__)
 
@@ -533,9 +580,20 @@ def main() -> None:
     except Exception:
         # En algunos entornos puede no estar permitido cambiar el manejador.
         logger.debug("No se pudo registrar el manejador de SIGINT")
-    win = ConfigWindow(cfg)
-    win.resize(400, 200)
-    win.show()
+
+    def _start_main_window() -> None:
+        win = ConfigWindow(cfg)
+        win.resize(400, 200)
+        win.show()
+        # Guardamos la referencia en la aplicación para evitar que el GC
+        # elimine la ventana principal antes de tiempo.
+        app._main_window = win  # type: ignore[attr-defined]
+        splash.finish(win)
+
+    # Primero mostramos solo el splash y, tras ~1.5s, abrimos la ventana
+    # principal y cerramos la pantalla de carga.
+    QTimer.singleShot(1500, _start_main_window)
+
     sys.exit(app.exec())
 
 

@@ -5,7 +5,12 @@ import { useLayoutTexts } from "./i18nLayout";
 
 type OS = "windows" | "mac" | "linux" | "other";
 
-const WINDOWS_DOWNLOAD_URL = process.env.NEXT_PUBLIC_WINDOWS_DOWNLOAD_URL || "";
+// URL por defecto del instalador de Windows. Se puede sobrescribir
+// mediante la variable NEXT_PUBLIC_WINDOWS_DOWNLOAD_URL si es
+// necesario en algún entorno.
+const WINDOWS_DOWNLOAD_URL =
+  process.env.NEXT_PUBLIC_WINDOWS_DOWNLOAD_URL ||
+  "/downloads/SetupScreensTranslatePro-v1.0.0.exe";
 
 type DownloadButtonProps = {
   variant?: "hero" | "nav";
