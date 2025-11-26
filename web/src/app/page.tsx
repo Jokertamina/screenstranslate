@@ -78,6 +78,11 @@ export default function Home() {
               Ver cómo funciona
             </Link>
           </div>
+          <p className="max-w-md text-xs text-slate-400">
+            Windows puede mostrar un aviso de SmartScreen la primera vez. Si has
+            descargado el instalador desde esta web, puedes hacer clic en
+            "Más información" y luego en "Ejecutar de todas formas".
+          </p>
           <div className="flex flex-wrap gap-4 text-xs text-slate-400">
             <span>✔ Sin registros obligatorios en el plan Basic</span>
             <span>✔ Atajo global configurable</span>
